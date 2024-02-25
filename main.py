@@ -4,9 +4,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
-from numpy.linalg import inv, norm
-
-
 # Variables de position et angle de la caméra
 xpos = 0
 ypos = 0
@@ -26,10 +23,14 @@ def init():
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(45, (800/600), 0.1, 50.0)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
     glEnable(GL_DEPTH_TEST)
+
+def draw_point(x,y,z):
+    glColor3f(1.0, 0.0, 0.0)  # Rouge
+    glPointSize(5)  # Taille du point
+    glBegin(GL_POINTS)
+    glVertex3f(x,y,z)  # Coordonnées du point en 3D
+    glEnd()
 
 def draw_cube():
     glBegin(GL_QUADS)
@@ -77,33 +78,14 @@ def draw_cube():
 
     glEnd()
 
-def sgn(x):
-    if x >= 0:
-        return 1
-    else:
-        return -1
-
-
-def CalculateObliqueMatrixOrtho(projection, clipPlane):
-    inv_projection = inv(projection)
-    q = np.dot(inv_projection, [sgn(clipPlane[0]), sgn(clipPlane[1]), 1.0, 1.0])
-    dot = np.dot(clipPlane, q)
-    c = clipPlane * (2.0 / dot)
-    projection[0][2] = c[0]
-    projection[1][2] = c[1]
-    projection[2][2] = c[2]
-    projection[3][2] = c[3] - 1.0
-    return projection
 
 
 def main():
     global xpos, ypos, zpos, xrot, yrot, left_pressed, right_pressed, up_pressed, down_pressed, space_pressed, shift_pressed
     pygame.init()
-    display = (800,600)
-    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
+    display = (600,600)
+    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)    
     init()
-    # gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
-    gluLookAt(0, 0, -5, 0, 0, 0, 0, 1, 0)
 
     clock = pygame.time.Clock()
     while True:
@@ -152,31 +134,48 @@ def main():
         elif shift_pressed:
             zpos -= 0.1
 
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
 
-        projection_matrix = np.array([
-                [2.0, 0.0, 0.0, 0.0],
-                [0.0, 2.0, 0.0, 0.0],
-                [0.0, 0.0, -2.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0]
-        ], dtype=np.float64)
 
-        # Plan de découpe
-        clip_plane = np.array([1.0, 1.0, 1.0, 1.0])
+        epsilonZpos = 2.5
+        epsilonXpos = 1
+        epsilonYpos = 1
+
+        near = 1.0
+        far = 100.0
+
+        # gestion zpos
+        # left = -1.0 / (zpos - epsilonZpos) 
+        # right = 1.0 / (zpos - epsilonZpos) 
+        # bottom = -1.0 / (zpos - epsilonZpos) 
+        # top = 1.0 / (zpos - epsilonZpos) 
+
+        # gestion xpos
+        left = ((xpos + 5) / 5 * -1) / (zpos / 5)
+        right = ((xpos - 5) / 5  * -1) / (zpos / 5)
+        bottom = ((ypos + 5) / 5 * -1) / (zpos / 5)
+        top = ((ypos - 5) / 5  * -1) / (zpos / 5)
+
+        # left = -1.0 
+        # right = 1
+        # bottom = -1.0 
+        # top = 1.0 
+        # near = 1.0
+        # far = 100.0
 
         
 
-        new_projection_matrix = CalculateObliqueMatrixOrtho(projection_matrix, clip_plane)
-
-
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glLoadMatrixf(new_projection_matrix)
-
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
+        glFrustum(left, right, bottom, top, near, far)
+        # gluLookAt(xpos, ypos, zpos, 0, 0, 0, 0, 1, 0)
+        gluLookAt(xpos, ypos, zpos, xpos, ypos, 0, 0, 1, 0)
+        print(xpos, ypos, zpos)
         draw_cube()
+        draw_point(5,0,0)
+        draw_point(-5,0,0)
+        draw_point(0,5,0)
+        draw_point(0,-5,0)
+        draw_point(0,0,-5)
         pygame.display.flip()
 
       
