@@ -4,6 +4,9 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
+from numpy.linalg import inv, norm
+
+
 # Variables de position et angle de la caméra
 xpos = 0
 ypos = 0
@@ -74,7 +77,23 @@ def draw_cube():
 
     glEnd()
 
+def sgn(x):
+    if x >= 0:
+        return 1
+    else:
+        return -1
 
+
+def CalculateObliqueMatrixOrtho(projection, clipPlane):
+    inv_projection = inv(projection)
+    q = np.dot(inv_projection, [sgn(clipPlane[0]), sgn(clipPlane[1]), 1.0, 1.0])
+    dot = np.dot(clipPlane, q)
+    c = clipPlane * (2.0 / dot)
+    projection[0][2] = c[0]
+    projection[1][2] = c[1]
+    projection[2][2] = c[2]
+    projection[3][2] = c[3] - 1.0
+    return projection
 
 
 def main():
@@ -134,9 +153,29 @@ def main():
             zpos -= 0.1
 
 
+        projection_matrix = np.array([
+                [2.0, 0.0, 0.0, 0.0],
+                [0.0, 2.0, 0.0, 0.0],
+                [0.0, 0.0, -2.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0]
+        ], dtype=np.float64)
+
+        # Plan de découpe
+        clip_plane = np.array([1.0, 1.0, 1.0, 1.0])
+
+        
+
+        new_projection_matrix = CalculateObliqueMatrixOrtho(projection_matrix, clip_plane)
+
+
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluLookAt(xpos, ypos, zpos, 0, 0, 0, 0, 1, 0)
+        glLoadMatrixf(new_projection_matrix)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+
         draw_cube()
         pygame.display.flip()
 
