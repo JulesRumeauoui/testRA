@@ -35,46 +35,47 @@ def draw_point(x,y,z):
 def draw_cube():
     glBegin(GL_QUADS)
     
+    # Top face
     glColor3f(1.0, 0.0, 0.0)  # Red color
-    glVertex3f(1.0, 1.0, -1.0) # Top right of quad (top)
-    glVertex3f(-1.0, 1.0, -1.0) # Top left of quad (top)
-    glVertex3f(-1.0, 1.0, 1.0) # Bottom left of quad (top)
-    glVertex3f(1.0, 1.0, 1.0) # Bottom right of quad (top)
+    glVertex3f(1.0, 1.0, -6.0) # Top right of quad (top)
+    glVertex3f(-1.0, 1.0, -6.0) # Top left of quad (top)
+    glVertex3f(-1.0, 1.0, -4.0) # Bottom left of quad (top)
+    glVertex3f(1.0, 1.0, -4.0) # Bottom right of quad (top)
 
     # Bottom face
     glColor3f(0.0, 1.0, 0.0)  # Green color
-    glVertex3f(1.0, -1.0, 1.0) # Top right of quad (bottom)
-    glVertex3f(-1.0, -1.0, 1.0) # Top left of quad (bottom)
-    glVertex3f(-1.0, -1.0, -1.0) # Bottom left of quad (bottom)
-    glVertex3f(1.0, -1.0, -1.0) # Bottom right of quad (bottom)
+    glVertex3f(1.0, -1.0, -4.0) # Top right of quad (bottom)
+    glVertex3f(-1.0, -1.0, -4.0) # Top left of quad (bottom)
+    glVertex3f(-1.0, -1.0, -6.0) # Bottom left of quad (bottom)
+    glVertex3f(1.0, -1.0, -6.0) # Bottom right of quad (bottom)
 
     # Front face
     glColor3f(0.0, 0.0, 1.0)  # Blue color
-    glVertex3f(1.0, 1.0, 1.0) # Top right of quad (front)
-    glVertex3f(-1.0, 1.0, 1.0) # Top left of quad (front)
-    glVertex3f(-1.0, -1.0, 1.0) # Bottom left of quad (front)
-    glVertex3f(1.0, -1.0, 1.0) # Bottom right of quad (front)
+    glVertex3f(1.0, 1.0, -4.0) # Top right of quad (front)
+    glVertex3f(-1.0, 1.0, -4.0) # Top left of quad (front)
+    glVertex3f(-1.0, -1.0, -4.0) # Bottom left of quad (front)
+    glVertex3f(1.0, -1.0, -4.0) # Bottom right of quad (front)
 
     # Back face
     glColor3f(1.0, 1.0, 0.0)  # Yellow color
-    glVertex3f(1.0, -1.0, -1.0) # Top right of quad (back)
-    glVertex3f(-1.0, -1.0, -1.0) # Top left of quad (back)
-    glVertex3f(-1.0, 1.0, -1.0) # Bottom left of quad (back)
-    glVertex3f(1.0, 1.0, -1.0) # Bottom right of quad (back)
+    glVertex3f(1.0, -1.0, -6.0) # Top right of quad (back)
+    glVertex3f(-1.0, -1.0, -6.0) # Top left of quad (back)
+    glVertex3f(-1.0, 1.0, -6.0) # Bottom left of quad (back)
+    glVertex3f(1.0, 1.0, -6.0) # Bottom right of quad (back)
 
     # Left face
     glColor3f(1.0, 0.0, 1.0)  # Purple color
-    glVertex3f(-1.0, 1.0, 1.0) # Top right of quad (left)
-    glVertex3f(-1.0, 1.0, -1.0) # Top left of quad (left)
-    glVertex3f(-1.0, -1.0, -1.0) # Bottom left of quad (left)
-    glVertex3f(-1.0, -1.0, 1.0) # Bottom right of quad (left)
+    glVertex3f(-1.0, 1.0, -4.0) # Top right of quad (left)
+    glVertex3f(-1.0, 1.0, -6.0) # Top left of quad (left)
+    glVertex3f(-1.0, -1.0, -6.0) # Bottom left of quad (left)
+    glVertex3f(-1.0, -1.0, -4.0) # Bottom right of quad (left)
 
     # Right face
     glColor3f(0.0, 1.0, 1.0)  # Cyan color
-    glVertex3f(1.0, 1.0, -1.0) # Top right of quad (right)
-    glVertex3f(1.0, 1.0, 1.0) # Top left of quad (right)
-    glVertex3f(1.0, -1.0, 1.0) # Bottom left of quad (right)
-    glVertex3f(1.0, -1.0, -1.0) # Bottom right of quad (right)
+    glVertex3f(1.0, 1.0, -6.0) # Top right of quad (right)
+    glVertex3f(1.0, 1.0, -4.0) # Top left of quad (right)
+    glVertex3f(1.0, -1.0, -4.0) # Bottom left of quad (right)
+    glVertex3f(1.0, -1.0, -6.0) # Bottom right of quad (right)
 
     glEnd()
 
@@ -157,6 +158,11 @@ def main():
         bottom = ((ypos + 5) / 5 * -1) / (zpos / 5)
         top = ((ypos - 5) / 5  * -1) / (zpos / 5)
 
+        
+        if zpos <=  2 :
+            zpos = 2
+        
+
         # left = -1.0 
         # right = 1
         # bottom = -1.0 
@@ -164,18 +170,16 @@ def main():
         # near = 1.0
         # far = 100.0
 
-        
 
         glFrustum(left, right, bottom, top, near, far)
         # gluLookAt(xpos, ypos, zpos, 0, 0, 0, 0, 1, 0)
         gluLookAt(xpos, ypos, zpos, xpos, ypos, 0, 0, 1, 0)
         print(xpos, ypos, zpos)
         draw_cube()
-        draw_point(5,0,0)
-        draw_point(-5,0,0)
-        draw_point(0,5,0)
-        draw_point(0,-5,0)
-        draw_point(0,0,-5)
+        draw_point(5,-5,0)
+        draw_point(-5,5,0)
+        draw_point(-5,-5,0)
+        draw_point(5,5,0)
         pygame.display.flip()
 
       
