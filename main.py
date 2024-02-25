@@ -76,15 +76,6 @@ def draw_cube():
 
 
 
-def calculate_oblique_matrix_ortho(projection_matrix, clip_plane):
-    q = np.dot(np.linalg.inv(projection_matrix), [np.sign(clip_plane[0]), np.sign(clip_plane[1]), 1.0, 1.0])
-    c = clip_plane * (2.0 / np.dot(clip_plane, q))
-    oblique_matrix = np.array(projection_matrix)
-    oblique_matrix[0][2] = c[0]
-    oblique_matrix[1][2] = c[1]
-    oblique_matrix[2][2] = c[2]
-    oblique_matrix[3][2] = c[3] - 1.0
-    return oblique_matrix
 
 def main():
     global xpos, ypos, zpos, xrot, yrot, left_pressed, right_pressed, up_pressed, down_pressed, space_pressed, shift_pressed
@@ -142,14 +133,6 @@ def main():
         elif shift_pressed:
             zpos -= 0.1
 
-        projection_matrix = glGetFloatv(GL_PROJECTION_MATRIX)
-
-        clip_plane = np.array([0.0, 1.0, 0.0, -1.0])
-
-        oblique_matrix = calculate_oblique_matrix_ortho(projection_matrix, clip_plane)
-        glLoadIdentity()
-
-        glMultMatrixf(oblique_matrix)
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
