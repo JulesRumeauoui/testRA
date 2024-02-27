@@ -21,7 +21,6 @@ cap = cv2.VideoCapture(0)
 
 # Charger le classificateur en cascade pour la détection de visage
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
 
 # Drapeaux pour les touches enfoncées
@@ -103,12 +102,21 @@ def get_face_position():
     # Convertir l'image en niveaux de gris pour la détection de visage
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # Détecter les visages dans l'image
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-
-   
-
-    for (x,y,w,h) in faces:
-        cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
+    faces = face_cascade.detectMultiScale(gray, 1.015, 7)
+    # Initialiser les variables pour le visage avec la plus grande largeur
+    max_width = 0
+    max_face = None
+    
+    # Trouver le visage avec la plus grande largeur
+    for (x, y, w, h) in faces:
+        if w > max_width:
+            max_width = w
+            max_face = (x, y, w, h)
+    
+    # Dessiner un rectangle autour du visage avec la plus grande largeur
+    if max_face is not None:
+        x, y, w, h = max_face
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
         # Calculer les coordonnées normalisées x et y du centre du visage
         pos_x = (x / (width - w) * 2) - 1
         pos_y = (y / (height - h) * 2) - 1
@@ -235,21 +243,6 @@ def main():
         ypos *= -1 
         
 
-
-        xpos_values.append(xpos)
-        ypos_values.append(ypos)
-        zpos_values.append(zpos)
-
-        if len(xpos_values) > n:
-            xpos_values = xpos_values[-n:]
-            ypos_values = ypos_values[-n:]
-            zpos_values = zpos_values[-n:]
-
-        # Calculer la moyenne glissante
-        avg_xpos = sum(xpos_values) / len(xpos_values)
-        avg_ypos = sum(ypos_values) / len(ypos_values)
-        avg_zpos = sum(zpos_values) / len(zpos_values)
-
         # left = -1.0 
         # right = 1
         # bottom = -1.0 
@@ -259,9 +252,9 @@ def main():
 
         glFrustum(left, right, bottom, top, near, far)
         # gluLookAt(xpos, ypos, zpos, xpos, ypos, 0, 0, 1, 0)
-        gluLookAt(avg_xpos, avg_ypos, avg_zpos, avg_xpos, avg_ypos, 0, 0, 1, 0)
+        gluLookAt(xpos, ypos, zpos, xpos, ypos, 0, 0, 1, 0)
         # print(xpos, ypos, zpos)
-        print(avg_xpos, avg_ypos, avg_zpos)
+        print(xpos, ypos, zpos)
         draw_cube()
 
         #coin
